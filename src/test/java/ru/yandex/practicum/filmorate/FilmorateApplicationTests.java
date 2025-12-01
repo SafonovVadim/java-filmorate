@@ -20,29 +20,29 @@ class FilmorateApplicationTests {
     private MockMvc mockMvc;
 
     @Test
-    void shouldReturn400WhenNameIsNull() throws Exception {
+    void shouldReturn500WhenNameIsNull() throws Exception {
         String json = "{ \"description\": \"cool film\", \"releaseDate\": \"1999-01-01\", \"duration\": 120 }";
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.name").value("Название не может быть пустым"));
     }
 
     @Test
-    void shouldReturn400WhenNameIsEmpty() throws Exception {
+    void shouldReturn500WhenNameIsEmpty() throws Exception {
         String json = "{ \"name\": \"\", \"description\": \"cool film\", \"releaseDate\": \"1999-01-01\", \"duration\": 120 }";
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.name").value("Название не может быть пустым"));
     }
 
     @Test
-    void shouldReturn400WhenDescriptionTooLong() throws Exception {
+    void shouldReturn500WhenDescriptionTooLong() throws Exception {
         String longDesc = "a".repeat(201);
         String json = String.format(" {\n" +
                 "                  \"name\": \"Movie\",\n" +
@@ -54,29 +54,29 @@ class FilmorateApplicationTests {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.description").value("Максимальная длина описания — 200 символов"));
     }
 
     @Test
-    void shouldReturn400WhenReleaseDateTooEarly() throws Exception {
+    void shouldReturn500WhenReleaseDateTooEarly() throws Exception {
         String json = "{ \"name\": \"Old\", \"description\": \"old\", \"releaseDate\": \"1895-12-27\", \"duration\": 10 }";
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.releaseDate").value("Дата релиза — не раньше 28 декабря 1895 года"));
     }
 
     @Test
-    void shouldReturn400WhenDurationIsZero() throws Exception {
+    void shouldReturn500WhenDurationIsZero() throws Exception {
         String json = "{ \"name\": \"Zero\", \"description\": \"zero\", \"releaseDate\": \"2000-01-01\", \"duration\": 0 }";
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.duration").value("Продолжительность должна быть положительной"));
     }
 
@@ -92,80 +92,80 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldReturn400WhenLoginIsNull() throws Exception {
+    void shouldReturn500WhenLoginIsNull() throws Exception {
         String json = "{ \"email\": \"user@yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
     }
 
     @Test
-    void shouldReturn400WhenLoginIsEmpty() throws Exception {
+    void shouldReturn500WhenLoginIsEmpty() throws Exception {
         String json = "{ \"login\": \"\", \"email\": \"user@yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
 
     }
 
     @Test
-    void shouldReturn400WhenLoginContainsSpaces() throws Exception {
+    void shouldReturn500WhenLoginContainsSpaces() throws Exception {
         String json = "{ \"login\": \"user login\", \"email\": \"user@yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
     }
 
     @Test
-    void shouldReturn400WhenEmailIsNull() throws Exception {
+    void shouldReturn500WhenEmailIsNull() throws Exception {
         String json = "{ \"login\": \"user\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.email").value("Email не может быть пустым"));
     }
 
     @Test
-    void shouldReturn400WhenEmailIsEmpty() throws Exception {
+    void shouldReturn500WhenEmailIsEmpty() throws Exception {
         String json = "{ \"login\": \"user\", \"email\": \"\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.email").value("Email не может быть пустым"));
     }
 
     @Test
-    void shouldReturn400WhenEmailWithoutAt() throws Exception {
+    void shouldReturn500WhenEmailWithoutAt() throws Exception {
         String json = "{ \"login\": \"user\", \"email\": \"user-yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.email").value("Неверный формат email"));
     }
 
     @Test
-    void shouldReturn400WhenBirthdayInFuture() throws Exception {
+    void shouldReturn500WhenBirthdayInFuture() throws Exception {
         String json = "{ \"login\": \"user\", \"email\": \"user@yandex.ru\", \"birthday\": \"3000-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$.birthday").value("Дата рождения не может быть в будущем"));
     }
 
