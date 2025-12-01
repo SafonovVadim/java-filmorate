@@ -99,7 +99,7 @@ class FilmorateApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.login").value("Логин не может быть пустым"));
+                .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
     }
 
     @Test
@@ -110,7 +110,7 @@ class FilmorateApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.login").value("Логин не может быть пустым"));
+                .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
 
     }
 
