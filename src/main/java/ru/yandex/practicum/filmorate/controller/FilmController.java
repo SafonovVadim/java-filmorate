@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static ru.yandex.practicum.filmorate.utils.UtilMethods.getNextId;
 
@@ -39,7 +40,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody(required = false) Film film) {
         if (!films.containsKey(film.getId()) || film.getId() == null) {
             log.error("Фильм с id {} не найден", film.getId());
             throw new NotFoundException("Фильм не найден");
@@ -53,5 +54,4 @@ public class FilmController {
         }
         return film;
     }
-
 }
