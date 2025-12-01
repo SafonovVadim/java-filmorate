@@ -44,14 +44,12 @@ class FilmorateApplicationTests {
     @Test
     void shouldReturn400WhenDescriptionTooLong() throws Exception {
         String longDesc = "a".repeat(201);
-        String json = String.format("""
-                {
-                  "name": "Movie",
-                  "description": "%s",
-                  "releaseDate": "2000-01-01",
-                  "duration": 100
-                }
-                """, longDesc);
+        String json = String.format(" {\n" +
+                "                  \"name\": \"Movie\",\n" +
+                "                  \"description\": \"%s\",\n" +
+                "                  \"releaseDate\": \"2000-01-01\",\n" +
+                "                  \"duration\": 100\n" +
+                "                }", longDesc);
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
