@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
@@ -28,13 +26,8 @@ public class FilmController {
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
         film.setId(getNextId(films));
-        try {
-            films.put(film.getId(), film);
-            log.info("Создан фильм с id={}", film.getId());
-        } catch (ConstraintViolationException e) {
-            log.error("Ошибка валидации");
-            throw new ValidationException("Ошибка валидации");
-        }
+        films.put(film.getId(), film);
+        log.info("Создан фильм с id={}", film.getId());
         return film;
     }
 
@@ -44,13 +37,8 @@ public class FilmController {
             log.error("Фильм с id {} не найден", film.getId());
             throw new NotFoundException("Фильм не найден");
         }
-        try {
-            films.put(film.getId(), film);
-            log.info("Обновлён фильм с id={}", film.getId());
-        } catch (ConstraintViolationException e) {
-            log.error("Ошибка валидации");
-            throw new ValidationException("Ошибка валидации");
-        }
+        films.put(film.getId(), film);
+        log.info("Обновлён фильм с id={}", film.getId());
         return film;
     }
 }
