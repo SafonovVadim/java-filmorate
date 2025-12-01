@@ -17,7 +17,7 @@ public class User {
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Неверный формат email")
     String email;
-    @NotBlank(message = "Логин не может быть пустым")
+    @NotBlank(message = "Логин не может быть пустым и содержать пробелы")
     @Pattern(regexp = "^[a-zA-Z0-9А-Яа-яЁё]+$", message = "Логин не может быть пустым и содержать пробелы")
     String login;
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
