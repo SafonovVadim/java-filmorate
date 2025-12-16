@@ -1,11 +1,10 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class ValidationExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(err ->
                 errors.put(err.getField(), err.getDefaultMessage())
         );
-        return ResponseEntity.internalServerError().body(errors);
+        return ResponseEntity.badRequest().body(errors);
     }
 
     @ExceptionHandler(NotFoundException.class)

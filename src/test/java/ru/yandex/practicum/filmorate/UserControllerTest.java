@@ -1,171 +1,146 @@
 package ru.yandex.practicum.filmorate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.yandex.practicum.filmorate.model.User;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import java.time.LocalDate;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class FilmorateApplicationTests {
+class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    void shouldReturn500WhenNameIsNull() throws Exception {
-        String json = "{ \"description\": \"cool film\", \"releaseDate\": \"1999-01-01\", \"duration\": 120 }";
+    private User user1;
+    private User user2;
+    private User user3;
 
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().is5xxServerError())
-                .andExpect(jsonPath("$.name").value("Название не может быть пустым"));
+    @BeforeEach
+    void setUp() throws Exception {
+        user1 = createUser("user1@yandex.ru", "user1", "User One", LocalDate.of(1990, 1, 1));
+        user2 = createUser("user2@yandex.ru", "user2", "User Two", LocalDate.of(1990, 1, 2));
+        user3 = createUser("user3@yandex.ru", "user3", "User Three", LocalDate.of(1990, 1, 3));
     }
 
-    @Test
-    void shouldReturn500WhenNameIsEmpty() throws Exception {
-        String json = "{ \"name\": \"\", \"description\": \"cool film\", \"releaseDate\": \"1999-01-01\", \"duration\": 120 }";
+    private User createUser(String email, String login, String name, LocalDate birthday) throws Exception {
+        String json = String.format("""
+                {
+                    "email": "%s",
+                    "login": "%s",
+                    "name": "%s",
+                    "birthday": "%s"
+                }
+                """, email, login, name, birthday);
 
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().is5xxServerError())
-                .andExpect(jsonPath("$.name").value("Название не может быть пустым"));
-    }
-
-    @Test
-    void shouldReturn500WhenDescriptionTooLong() throws Exception {
-        String longDesc = "a".repeat(201);
-        String json = String.format(" {\n" +
-                "                  \"name\": \"Movie\",\n" +
-                "                  \"description\": \"%s\",\n" +
-                "                  \"releaseDate\": \"2000-01-01\",\n" +
-                "                  \"duration\": 100\n" +
-                "                }", longDesc);
-
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().is5xxServerError())
-                .andExpect(jsonPath("$.description").value("Максимальная длина описания — 200 символов"));
-    }
-
-    @Test
-    void shouldReturn500WhenReleaseDateTooEarly() throws Exception {
-        String json = "{ \"name\": \"Old\", \"description\": \"old\", \"releaseDate\": \"1895-12-27\", \"duration\": 10 }";
-
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().is5xxServerError())
-                .andExpect(jsonPath("$.releaseDate").value("Дата релиза — не раньше 28 декабря 1895 года"));
-    }
-
-    @Test
-    void shouldReturn500WhenDurationIsZero() throws Exception {
-        String json = "{ \"name\": \"Zero\", \"description\": \"zero\", \"releaseDate\": \"2000-01-01\", \"duration\": 0 }";
-
-        mockMvc.perform(post("/films")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().is5xxServerError())
-                .andExpect(jsonPath("$.duration").value("Продолжительность должна быть положительной"));
-    }
-
-    @Test
-    void shouldReturn200WhenValidFilm() throws Exception {
-        String json = "{ \"name\": \"Valid\", \"description\": \"good\", \"releaseDate\": \"1999-01-01\", \"duration\": 100 }";
-
-        mockMvc.perform(post("/films")
+        String result = mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Valid"));
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(result);
+        long id = root.get("id").asLong();
+
+        return User.builder()
+                .id(id)
+                .email(email)
+                .login(login)
+                .name(name)
+                .birthday(birthday)
+                .build();
     }
 
     @Test
-    void shouldReturn500WhenLoginIsNull() throws Exception {
+    void shouldReturn400WhenLoginIsNull() throws Exception {
         String json = "{ \"email\": \"user@yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
     }
 
     @Test
-    void shouldReturn500WhenLoginIsEmpty() throws Exception {
+    void shouldReturn400WhenLoginIsEmpty() throws Exception {
         String json = "{ \"login\": \"\", \"email\": \"user@yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
 
     }
 
     @Test
-    void shouldReturn500WhenLoginContainsSpaces() throws Exception {
+    void shouldReturn400WhenLoginContainsSpaces() throws Exception {
         String json = "{ \"login\": \"user login\", \"email\": \"user@yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.login").value("Логин не может быть пустым и содержать пробелы"));
     }
 
     @Test
-    void shouldReturn500WhenEmailIsNull() throws Exception {
+    void shouldReturn400WhenEmailIsNull() throws Exception {
         String json = "{ \"login\": \"user\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.email").value("Email не может быть пустым"));
     }
 
     @Test
-    void shouldReturn500WhenEmailIsEmpty() throws Exception {
+    void shouldReturn400WhenEmailIsEmpty() throws Exception {
         String json = "{ \"login\": \"user\", \"email\": \"\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.email").value("Email не может быть пустым"));
     }
 
     @Test
-    void shouldReturn500WhenEmailWithoutAt() throws Exception {
+    void shouldReturn400WhenEmailWithoutAt() throws Exception {
         String json = "{ \"login\": \"user\", \"email\": \"user-yandex.ru\", \"birthday\": \"1990-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.email").value("Неверный формат email"));
     }
 
     @Test
-    void shouldReturn500WhenBirthdayInFuture() throws Exception {
+    void shouldReturn400WhenBirthdayInFuture() throws Exception {
         String json = "{ \"login\": \"user\", \"email\": \"user@yandex.ru\", \"birthday\": \"3000-01-01\" }";
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().is5xxServerError())
+                .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.birthday").value("Дата рождения не может быть в будущем"));
     }
 
@@ -228,5 +203,76 @@ class FilmorateApplicationTests {
                 .andExpect(jsonPath("$.login").value("userUpdated"))
                 .andExpect(jsonPath("$.email").value("updated@yandex.ru"));
     }
-}
 
+    @Test
+    void shouldAddFriend() throws Exception {
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user1.getId(), user2.getId()))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/users/{id}/friends", user1.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(user2.getId()));
+    }
+
+    @Test
+    void shouldRemoveFriend() throws Exception {
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user1.getId(), user2.getId()))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete("/users/{id}/friends/{friendId}", user1.getId(), user2.getId()))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/users/{id}/friends", user1.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void shouldGetFriendsList() throws Exception {
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user1.getId(), user2.getId())).andExpect(status().isOk());
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user1.getId(), user3.getId())).andExpect(status().isOk());
+
+        mockMvc.perform(get("/users/{id}/friends", user1.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[?(@.id == %d)]", user2.getId()).exists())
+                .andExpect(jsonPath("$[?(@.id == %d)]", user3.getId()).exists());
+    }
+
+    @Test
+    void shouldGetCommonFriends() throws Exception {
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user1.getId(), user3.getId())).andExpect(status().isOk());
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user2.getId(), user3.getId())).andExpect(status().isOk());
+
+        mockMvc.perform(get("/users/{id}/friends/common/{otherId}", user1.getId(), user2.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(user3.getId()));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoCommonFriends() throws Exception {
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user1.getId(), user2.getId())).andExpect(status().isOk());
+
+        mockMvc.perform(put("/users/{id}/friends/{friendId}", user2.getId(), user1.getId())).andExpect(status().isOk());
+
+        mockMvc.perform(get("/users/{id}/friends/common/{otherId}", user1.getId(), user2.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void shouldReturn404WhenUserNotFound() throws Exception {
+        mockMvc.perform(put("/users/999/friends/1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn404WhenFriendNotFound() throws Exception {
+        mockMvc.perform(put("/users/1/friends/999"))
+                .andExpect(status().isNotFound());
+    }
+}

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -8,12 +9,14 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.ReleaseDateAfter;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Film.
  */
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film {
     Long id;
     @NotBlank(message = "Название не может быть пустым")
@@ -24,4 +27,5 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Продолжительность должна быть положительной")
     Integer duration;
+    Set<Long> likes;
 }
