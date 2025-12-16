@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 @Service
 
@@ -35,7 +35,7 @@ public class FilmService {
         return inMemoryFilmStorage.getAll();
     }
 
-    public Set<Film> getPopularFilms(Long count) {
+    public List<Film> getPopularFilms(Long count) {
         return inMemoryFilmStorage.getPopularFilms(count);
     }
 
