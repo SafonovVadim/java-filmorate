@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -9,6 +8,7 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.ReleaseDateAfter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,7 +16,6 @@ import java.util.Set;
  */
 @Data
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film {
     Long id;
     @NotBlank(message = "Название не может быть пустым")
@@ -27,5 +26,13 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Продолжительность должна быть положительной")
     Integer duration;
-    Set<Long> likes;
+    @Builder.Default
+    private Set<Long> likes = new HashSet<>();
+
+    public Set<Long> getLikes() {
+        if (likes == null) {
+            likes = new HashSet<>();
+        }
+        return likes;
+    }
 }

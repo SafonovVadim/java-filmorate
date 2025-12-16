@@ -59,12 +59,8 @@ public class InMemoryUserStorage implements UserStorage {
     public User addFriend(Long userId, Long friendId) {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-        Set<Long> userFriends = user.getFriends() != null ? new HashSet<>(user.getFriends()) : new HashSet<>();
-        Set<Long> friendFriends = friend.getFriends() != null ? new HashSet<>(friend.getFriends()) : new HashSet<>();
-        userFriends.add(friendId);
-        friendFriends.add(userId);
-        user.setFriends(userFriends);
-        friend.setFriends(friendFriends);
+        user.getFriends().add(friendId);
+        friend.getFriends().add(userId);
         updateUser(user);
         updateUser(friend);
         return user;
@@ -73,12 +69,8 @@ public class InMemoryUserStorage implements UserStorage {
     public User removeFriend(Long userId, Long friendId) {
         User user = getUserById(userId);
         User friend = getUserById(friendId);
-        Set<Long> userFriends = user.getFriends() != null ? new HashSet<>(user.getFriends()) : new HashSet<>();
-        Set<Long> friendFriends = friend.getFriends() != null ? new HashSet<>(friend.getFriends()) : new HashSet<>();
-        userFriends.remove(friendId);
-        friendFriends.remove(userId);
-        user.setFriends(userFriends);
-        friend.setFriends(friendFriends);
+        user.getFriends().remove(friendId);
+        friend.getFriends().remove(userId);
         updateUser(user);
         updateUser(friend);
         return user;

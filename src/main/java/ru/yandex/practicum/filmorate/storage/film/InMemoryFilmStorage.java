@@ -58,9 +58,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film addLike(Long filmId, Long userId, InMemoryUserStorage userStorage) {
         Film film = getFilmById(filmId);
         User user = userStorage.getUserById(userId);
-        Set<Long> likes = film.getLikes() != null ? new HashSet<>(film.getLikes()) : new HashSet<>();
-        likes.add(user.getId());
-        film.setLikes(likes);
+        film.getLikes().add(user.getId());
         updateFilm(film);
         return film;
     }
@@ -68,9 +66,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film removeLike(Long filmId, Long userId, InMemoryUserStorage userStorage) {
         Film film = getFilmById(filmId);
         User user = userStorage.getUserById(userId);
-        Set<Long> likes = film.getLikes() != null ? new HashSet<>(film.getLikes()) : new HashSet<>();
-        likes.remove(user.getId());
-        film.setLikes(likes);
+        film.getLikes().remove(user.getId());
         updateFilm(film);
         return film;
     }
@@ -85,7 +81,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public List<Film> getPopularFilms(Long count) {
         return films.values().stream()
-                .filter(film -> film.getLikes() != null && !film.getLikes().isEmpty())
+                .filter(film -> !film.getLikes().isEmpty())
                 .sorted(Comparator.comparing(film -> -film.getLikes().size()))
                 .limit(count)
                 .collect(Collectors.toList());

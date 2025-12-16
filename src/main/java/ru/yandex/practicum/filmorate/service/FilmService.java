@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-
 public class FilmService {
     private final InMemoryFilmStorage inMemoryFilmStorage;
     private final InMemoryUserStorage inMemoryUserStorage;
@@ -45,8 +44,5 @@ public class FilmService {
 
     public Film removeLike(final Long filmId, final Long userId) {
         return inMemoryFilmStorage.removeLike(filmId, userId, inMemoryUserStorage);
-    }
-
-    void getAllLikes() {
     }
 }
