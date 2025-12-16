@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Service
@@ -30,7 +31,7 @@ public class FilmService {
         return inMemoryFilmStorage.deleteFilm(filmId);
     }
 
-    public Set<Film> getAllFilms() {
+    public Collection<Film> getAllFilms() {
         return inMemoryFilmStorage.getAll();
     }
 

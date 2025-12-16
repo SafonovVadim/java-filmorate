@@ -52,8 +52,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Set<User> getAll() {
-        return new HashSet<>(users.values());
+    public Collection<User> getAll() {
+        return users.values();
     }
 
     public User addFriend(Long userId, Long friendId) {

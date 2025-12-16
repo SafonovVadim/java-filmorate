@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
+import java.util.Collection;
 import java.util.Set;
 
 @Service
@@ -26,7 +27,7 @@ public class UserService {
         return inMemoryUserStorage.deleteUser(userId);
     }
 
-    public Set<User> getAllUsers() {
+    public Collection<User> getAllUsers() {
         return inMemoryUserStorage.getAll();
     }
 

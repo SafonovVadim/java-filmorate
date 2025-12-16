@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.utils.UtilMethods.getNextId;
@@ -54,8 +51,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Set<Film> getAll() {
-        return new HashSet<>(films.values());
+    public Collection<Film> getAll() {
+        return films.values();
     }
 
     public Film addLike(Long filmId, Long userId, InMemoryUserStorage userStorage) {
