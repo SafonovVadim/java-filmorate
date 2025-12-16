@@ -70,14 +70,12 @@ class FilmControllerTest {
     }
 
     private String toJson(Object obj) {
-        return """
-                {
-                  "name": "%s",
-                  "description": "%s",
-                  "releaseDate": "%s",
-                  "duration": %d
-                }
-                """.formatted(
+        return String.format("{\n" +
+                        "  \"name\": \"%s\",\n" +
+                        "  \"description\": \"%s\",\n" +
+                        "  \"releaseDate\": \"%s\",\n" +
+                        "  \"duration\": %d\n" +
+                        "}",
                 ((Film) obj).getName(),
                 ((Film) obj).getDescription(),
                 ((Film) obj).getReleaseDate(),
@@ -86,14 +84,13 @@ class FilmControllerTest {
     }
 
     private String toUserJson(Object obj) {
-        return """
-                {
-                  "email": "%s",
-                  "login": "%s",
-                  "name": "%s",
-                  "birthday": "%s"
-                }
-                """.formatted(
+        return String.format(
+                "{\n" +
+                        "  \"email\": \"%s\",\n" +
+                        "  \"login\": \"%s\",\n" +
+                        "  \"name\": \"%s\",\n" +
+                        "  \"birthday\": \"%s\"\n" +
+                        "}",
                 ((User) obj).getEmail(),
                 ((User) obj).getLogin(),
                 ((User) obj).getName(),
@@ -162,14 +159,14 @@ class FilmControllerTest {
     @Test
     void shouldReturn400WhenDescriptionTooLong() throws Exception {
         String longDesc = "a".repeat(201);
-        String json = String.format("""
-                 {
-                                  "name": "Movie",
-                                  "description": "%s",
-                                  "releaseDate": "2000-01-01",
-                                  "duration": 100
-                                }\
-                """, longDesc);
+        String json = String.format("{\n" +
+                        "  \"name\": \"Movie\",\n" +
+                        "  \"description\": \"%s\",\n" +
+                        "  \"releaseDate\": \"2000-01-01\",\n" +
+                        "  \"duration\": 100\n" +
+                        "}",
+                longDesc
+        );
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
