@@ -36,14 +36,14 @@ class UserControllerTest {
     }
 
     private User createUser(String email, String login, String name, LocalDate birthday) throws Exception {
-        String json = String.format("""
-                {
-                    "email": "%s",
-                    "login": "%s",
-                    "name": "%s",
-                    "birthday": "%s"
-                }
-                """, email, login, name, birthday);
+        String json = String.format("{\n" +
+                        "    \"email\": \"%s\",\n" +
+                        "    \"login\": \"%s\",\n" +
+                        "    \"name\": \"%s\",\n" +
+                        "    \"birthday\": \"%s\"\n" +
+                        "}",
+                email, login, name, birthday
+        );
 
         String result = mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
