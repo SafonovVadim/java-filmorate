@@ -8,6 +8,8 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.ReleaseDateAfter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -24,4 +26,13 @@ public class Film {
     LocalDate releaseDate;
     @Positive(message = "Продолжительность должна быть положительной")
     Integer duration;
+    @Builder.Default
+    private Set<Long> likes = new HashSet<>();
+
+    public Set<Long> getLikes() {
+        if (likes == null) {
+            likes = new HashSet<>();
+        }
+        return likes;
+    }
 }
